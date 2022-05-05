@@ -233,9 +233,11 @@ func GetBindarrs(stmt Statement) map[string]struct{} {
 		case *SQLVal:
 			if node.Type == ValArg {
 				bindvars[string(node.Val[1:])] = struct{}{}
+				fmt.Println(string(node.Val[1:]))
 			}
 		case ListArg:
 			bindvars[string(node[2:])] = struct{}{}
+			fmt.Println(string(node[2:]))
 		}
 		return true, nil
 	}, stmt)
