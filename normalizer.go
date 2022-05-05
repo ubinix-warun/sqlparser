@@ -222,3 +222,22 @@ func GetBindvars(stmt Statement) map[string]struct{} {
 	}, stmt)
 	return bindvars
 }
+
+// GetBindarrs returns a map of the bind arrs referenced in the statement.
+// TODO(sougou); This function gets called again from vtgate/planbuilder.
+// Ideally, this should be done only once.
+func GetBindarrs(stmt Statement) map[string]struct{} {
+	bindvars := make(map[string]struct{})
+	_ = Walk(func(node SQLNode) (kontinue bool, err error) {
+		switch node := node.(type) {
+		case *SQLVal:
+			if node.Type == ValArg {
+				bindvars[string(node.Val[1:])] = struct{}{}
+			}
+		case ListArg:
+			bindvars[string(node[2:])] = struct{}{}
+		}
+		return true, nil
+	}, stmt)
+	return bindvars
+}
